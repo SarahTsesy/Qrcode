@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+ <meta charset="UTF-8">
+ <title>QR Code Scanner</title>
+ <script src="https://unpkg.com/html5-qrcode"></script>
+ <style>
+   #reader {
+     width: 300px;
+     margin: auto;
+   }
+ </style>
+</head>
+<body>
+ <h2>請掃描 QR Code</h2>
+ <div id="reader"></div>
+
+ <script>
+   function onScanSuccess(qrCodeMessage) {
+     console.log("Scanned result:", qrCodeMessage);
+     window.location.href = qrCodeMessage;  // 掃描後跳轉網址
+   }
+
+   function onScanError(errorMessage) {
+     // 你可以選擇顯示錯誤或忽略
+     console.warn(errorMessage);
+   }
+
+   const html5QrCode = new Html5Qrcode("reader");
+   const config = {
+     fps: 10,
+     qrbox: 250,
+     facingMode: "user" // 使用前鏡頭
+   };
+
+   html5QrCode.start(
+     { facingMode: "user" },
+     config,
+     onScanSuccess,
+     onScanError
+   );
+ </script>
+</body>
+</html>
