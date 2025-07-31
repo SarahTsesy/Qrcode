@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>掃描結果</title>
+</head>
+<body>
+  <h2>掃描結果：</h2>
+  <div id="output"></div>
+
+  <script>
+    // 取得網址中的 data 參數
+    const params = new URLSearchParams(window.location.search);
+    const data = params.get("data");
+
+    document.getElementById("output").innerText = data || "沒有收到任何資料";
+  </script>
+</body>
+</html>
