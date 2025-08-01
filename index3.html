@@ -2,52 +2,65 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>放學接送打打氣</title>
+<title>智能 QR 掃描器</title>
 <script src="https://unpkg.com/html5-qrcode"></script>
 <style>
    html, body {
      margin: 0;
      padding: 0;
+     font-family: sans-serif;
      background: #000;
      color: white;
-     height: 100%;
+     height: 100vh;
      overflow: hidden;
    }
+   header {
+     text-align: center;
+     padding: 15px;
+     font-size: 20px;
+     background-color: #222;
+     color: #fff;
+   }
    #reader {
-     width: 100vw;
-     height: 100vh;
+     width: 100%;
+     height: calc(100vh - 60px); /* 扣除 header 高度 */
+     display: flex;
+     justify-content: center;
+     align-items: center;
+   }
+   #reader > div {
+     width: 90vw;
+     max-width: 500px;
+     aspect-ratio: 1 / 1;
    }
 </style>
 </head>
 <body>
-   
+<header>放學接送打打氣</header>
 <div id="reader"></div>
-   <h3 font-color='white'>放學接送打打氣</h3>
 <script>
    let html5QrCode;
    let isRunning = false;
-   // 檢測是否為 iPad
    function isIpad() {
      const ua = navigator.userAgent.toLowerCase();
      return /ipad/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
    }
-   // 檢測是否為手機
    function isMobile() {
      return /iphone|android|mobile/i.test(navigator.userAgent);
    }
-   // 決定使用前或後鏡頭
    function getCameraFacingMode() {
-     if (isIpad()) return "user";          // iPad 用前鏡
-     if (isMobile()) return "environment"; // 手機用後鏡
-     return "user";                        // 其他情況預設前鏡
+     if (isIpad()) return "user";
+     if (isMobile()) return "environment";
+     return "user";
    }
-   function getFullScreenBoxSize() {
-     const minDim = Math.min(window.innerWidth, window.innerHeight);
-     return Math.floor(minDim * 0.95);
+   function getBoxSize() {
+     const minSide = Math.min(window.innerWidth, window.innerHeight - 60); // 扣 header
+     const boxSize = Math.floor(minSide * 0.85);
+     return Math.min(boxSize, 500);
    }
    function startScanner() {
      const facingMode = getCameraFacingMode();
-     const qrboxSize = getFullScreenBoxSize();
+     const qrboxSize = getBoxSize();
      if (isRunning) {
        html5QrCode.stop().then(() => {
          startHtml5QrCode(facingMode, qrboxSize);
@@ -76,7 +89,6 @@
    function onScanSuccess(qrCodeMessage) {
      const encodedData = encodeURIComponent(qrCodeMessage.trim());
      html5QrCode.stop().then(() => {
-       // 👉 掃完後自動轉頁，沒有留底任何資料（如你要"delete"）
        window.location.href = `result.html?data=${encodedData}`;
      });
    }
