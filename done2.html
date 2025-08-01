@@ -16,12 +16,14 @@
      flex-direction: column;
      align-items: center;
      justify-content: center;
+     position: relative;
    }
    h1 {
      font-size: 46px;
      text-align: center;
      margin: 20px;
      padding: 0 10px;
+     z-index: 1;
    }
    button {
      background: none;
@@ -31,14 +33,37 @@
    }
    .star {
      height: 50vh;
-     animation: rotate-swing 2s infinite;
+     animation: swing 2s infinite, glow 1.5s infinite alternate;
    }
-   @keyframes rotate-swing {
+   @keyframes swing {
      0% { transform: rotate(0deg); }
-     25% { transform: rotate(-15deg); }
+     25% { transform: rotate(-10deg); }
      50% { transform: rotate(0deg); }
-     75% { transform: rotate(15deg); }
+     75% { transform: rotate(10deg); }
      100% { transform: rotate(0deg); }
+   }
+   @keyframes glow {
+     from { filter: drop-shadow(0 0 10px #ffd700); }
+     to { filter: drop-shadow(0 0 20px #ffcc00); }
+   }
+   /* +1 星星動畫文字 */
+   .plus-one {
+     position: absolute;
+     font-size: 32px;
+     font-weight: bold;
+     color: #ff9900;
+     animation: riseAndFade 1s ease-out forwards;
+     pointer-events: none;
+   }
+   @keyframes riseAndFade {
+     0% {
+       opacity: 1;
+       transform: translateY(0);
+     }
+     100% {
+       opacity: 0;
+       transform: translateY(-100px);
+     }
    }
    audio {
      display: none;
@@ -46,30 +71,35 @@
 </style>
 </head>
 <body>
-<!-- 標題 -->
 <h1>家長，歡迎你！點擊星星為孩子打打氣！</h1>
 <!-- 星星按鈕 -->
-<button onclick="playAndGo()">
+<button onclick="playAndGo(event)">
 <img src="star.png" alt="星星" class="star">
 </button>
-<!-- 聲音 -->
+<!-- 聲效 -->
 <audio id="dingSound">
 <source src="ding.mp3" type="audio/mpeg">
    您的瀏覽器不支援音效播放。
 </audio>
+<!-- JS 邏輯 -->
 <script>
-   function playAndGo() {
+   function playAndGo(event) {
      const audio = document.getElementById("dingSound");
-     audio.play().catch(e => {
-       // 若無法播放（因自動播放限制），直接跳轉
-       console.warn("音效播放失敗，自動跳轉", e);
-       goNext();
-     });
-     // 等 1 秒讓聲音播放，再跳頁
-     setTimeout(goNext, 1000);
-   }
-   function goNext() {
-     window.location.href = "done.html"; // 替換為你要跳轉的頁面
+     audio.play().catch(e => console.warn("音效播放失敗：", e));
+     // 在星星按鈕位置產生 +1動畫
+     const plusOne = document.createElement('div');
+     plusOne.className = 'plus-one';
+     plusOne.textContent = '+1 星星 ✨';
+     // 定位在按下的星星中央
+     const btnRect = event.currentTarget.getBoundingClientRect();
+     plusOne.style.left = `${btnRect.left + btnRect.width / 2}px`;
+     plusOne.style.top = `${btnRect.top + btnRect.height / 2}px`;
+     document.body.appendChild(plusOne);
+     // 自動移除動畫文字
+     setTimeout(() => {
+       plusOne.remove();
+       window.location.href = "done.html"; // ✅ 跳轉
+     }, 1000);
    }
 </script>
 </body>
