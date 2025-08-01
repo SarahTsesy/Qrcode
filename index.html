@@ -1,53 +1,46 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="UTF-8">
-  <title>QR Code Scanner</title>
-  <script src="https://unpkg.com/html5-qrcode"></script>
-  <style>
-    #reader {
-      width: 100%;
-     
-      margin: auto;
-    }
-  </style>
+<meta charset="UTF-8">
+<title>QR Code Scanner</title>
+<script src="https://unpkg.com/html5-qrcode"></script>
+<style>
+   #reader {
+     width: 100%; 
+     margin: auto;
+   }
+</style>
 </head>
 <body>
-  <h2>請掃描 QR Code</h2>
-  <div id="reader"></div>
-
-  <script>
-    function onScanSuccess(qrCodeMessage) {
-      console.log("Scanned result:", qrCodeMessage);
-
-      // 將掃描結果轉成 URL encode 放入變數
-      const encodedData = encodeURIComponent(qrCodeMessage.trim());
-
-      // 跳轉到另一個頁面，並用 ?data=xxx 傳資料
-      window.location.href = `result.html?data=${encodedData}`;
-    }
-
-    function onScanError(errorMessage) {
-      // 可以選擇忽略錯誤或顯示
-      console.warn(errorMessage);
-    }
-
-    const html5QrCode = new Html5Qrcode("reader");
-    const config = {
-      fps: 10,
-      qrbox: {
-        width: 80%, // 放大掃描框
-        height: 80%;
-      },
-      facingMode: "user"
-    };
-
-    html5QrCode.start(
-      { facingMode: "user" },
-      config,
-      onScanSuccess,
-      onScanError
-    );
-  </script>
+<h2>請掃描 QR Code</h2>
+<div id="reader"></div>
+<script>
+   function onScanSuccess(qrCodeMessage) {
+     console.log("Scanned result:", qrCodeMessage);
+     // 將掃描結果轉成 URL encode 放入變數
+     const encodedData = encodeURIComponent(qrCodeMessage.trim());
+     // 跳轉到另一個頁面，並用 ?data=xxx 傳資料
+     window.location.href = `result.html?data=${encodedData}`;
+   }
+   function onScanError(errorMessage) {
+     // 可以選擇忽略錯誤或顯示
+     console.warn(errorMessage);
+   }
+   const html5QrCode = new Html5Qrcode("reader");
+   const config = {
+     fps: 10,
+     qrbox: {
+       width: 300, // 放大掃描框
+       height: 300
+     },
+     facingMode: "user"
+   };
+   html5QrCode.start(
+     { facingMode: "user" },
+     config,
+     onScanSuccess,
+     onScanError
+   );
+</script>
 </body>
 </html>
