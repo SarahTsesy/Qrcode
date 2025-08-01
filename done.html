@@ -18,8 +18,7 @@
      overflow: hidden;
    }
    img {
-     width: 150px;
-     height: auto;
+     height: 50vh;
      animation: rotate-swing 2s infinite;
    }
    @keyframes rotate-swing {
@@ -31,19 +30,45 @@
    }
    .message {
      margin-top: 20px;
-     font-size: 20px;
+     font-size: 28px;
      font-weight: bold;
      text-align: center;
+   }
+   .countdown {
+     margin-top: 10px;
+     font-size: 22px;
+     color: #aa0000;
+   }
+   audio {
+     display: none;
    }
 </style>
 </head>
 <body>
-<img src="star.png" alt="星星">
+<!-- 星星圖片 -->
+<img src="star.png" alt="星星" />
+<!-- 文字訊息 -->
 <div class="message">放學打打氣，增值一粒星星</div>
+<!-- 倒數提示 -->
+<div class="countdown" id="countdown">5 秒後返回首頁…</div>
+<!-- 聲效 -->
+<audio id="sound" autoplay>
+<source src="ding.mp3" type="audio/mpeg">
+   您的瀏覽器不支援 audio 標籤。
+</audio>
 <script>
-   setTimeout(() => {
-     window.location.href = "index2.html";
-   }, 5000);
+   // 倒數邏輯
+   let seconds = 5;
+   const countdownEl = document.getElementById('countdown');
+   const interval = setInterval(() => {
+     seconds--;
+     if (seconds > 0) {
+       countdownEl.textContent = `${seconds} 秒後返回首頁…`;
+     } else {
+       clearInterval(interval);
+       window.location.href = "index.html";
+     }
+   }, 1000);
 </script>
 </body>
 </html>
