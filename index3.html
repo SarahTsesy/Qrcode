@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>智能 QR 掃描器</title>
+<script src="https://unpkg.com/html5-qrcode"></script>
+<style>
+   html, body {
+     margin: 0;
+     padding: 0;
+     background: #000;
+     color: white;
+     height: 100%;
+     overflow: hidden;
+   }
+   #reader {
+     width: 100vw;
+     height: 100vh;
+   }
+</style>
+</head>
+<body>
+<div id="reader"></div>
+<script>
+   let html5QrCode;
+   let isRunning = false;
+   // 檢測是否為 iPad
+   function isIpad() {
+     const ua = navigator.userAgent.toLowerCase();
+     return /ipad/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+   }
+   // 檢測是否為手機
+   function isMobile() {
+     return /iphone|android|mobile/i.test(navigator.userAgent);
+   }
+   // 決定使用前或後鏡頭
+   function getCameraFacingMode() {
+     if (isIpad()) return "user";          // iPad 用前鏡
+     if (isMobile()) return "environment"; // 手機用後鏡
+     return "user";                        // 其他情況預設前鏡
+   }
+   function getFullScreenBoxSize() {
+     const minDim = Math.min(window.innerWidth, window.innerHeight);
+     return Math.floor(minDim * 0.95);
+   }
+   function startScanner() {
+     const facingMode = getCameraFacingMode();
+     const qrboxSize = getFullScreenBoxSize();
+     if (isRunning) {
+       html5QrCode.stop().then(() => {
+         startHtml5QrCode(facingMode, qrboxSize);
+       });
+     } else {
+       startHtml5QrCode(facingMode, qrboxSize);
+     }
+   }
+   function startHtml5QrCode(facingMode, qrboxSize) {
+     html5QrCode = new Html5Qrcode("reader");
+     html5QrCode.start(
+       { facingMode: facingMode },
+       {
+         fps: 10,
+         qrbox: {
+           width: qrboxSize,
+           height: qrboxSize
+         }
+       },
+       onScanSuccess,
+       onScanError
+     ).then(() => {
+       isRunning = true;
+     }).catch(err => console.error("啟動失敗:", err));
+   }
+   function onScanSuccess(qrCodeMessage) {
+     const encodedData = encodeURIComponent(qrCodeMessage.trim());
+     html5QrCode.stop().then(() => {
+       // 👉 掃完後自動轉頁，沒有留底任何資料（如你要"delete"）
+       window.location.href = `result.html?data=${encodedData}`;
+     });
+   }
+   function onScanError(errorMessage) {
+     // 可以忽略錯誤
+   }
+   startScanner();
+   window.addEventListener("resize", () => {
+     clearTimeout(window.resizeTimeout);
+     window.resizeTimeout = setTimeout(() => {
+       startScanner();
+     }, 300);
+   });
+</script>
+</body>
+</html>
