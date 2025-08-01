@@ -2,46 +2,115 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>QR Code Scanner</title>
+<title>智能 QR 掃描器</title>
 <script src="https://unpkg.com/html5-qrcode"></script>
 <style>
+   html, body {
+     margin: 0;
+     padding: 0;
+     font-family: sans-serif;
+     background: #000;
+     color: white;
+     height: 100vh;
+     overflow: hidden;
+     display: flex;
+     flex-direction: column;
+   }
+   header {
+     display: flex;
+     align-items: center;
+     padding: 15px;
+     font-size: 20px;
+     background-color: #111;
+     color: #fff;
+     flex: 0 0 auto;
+   }
+   .back-button {
+     margin-right: 15px;
+     color: #00bfff;
+     background: none;
+     border: none;
+     font-size: 18px;
+     cursor: pointer;
+   }
    #reader {
-     width: 100%; 
-      height: 90%; 
-     margin: auto;
+     flex: 1 1 auto;
+     width: 100%;
+     display: flex;
+     align-items: center;
+     justify-content: center;
    }
 </style>
 </head>
 <body>
-<h2>請掃描 QR Code</h2>
+<header>
+<button class="back-button" onclick="window.location.href='index.html'">← 返回</button>
+   放學接送打打氣
+</header>
 <div id="reader"></div>
 <script>
+   let html5QrCode;
+   let isRunning = false;
+   function isIpad() {
+     const ua = navigator.userAgent.toLowerCase();
+     return /ipad/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+   }
+   function isMobile() {
+     return /iphone|android|mobile/i.test(navigator.userAgent);
+   }
+   function getCameraFacingMode() {
+     if (isIpad()) return "user";
+     if (isMobile()) return "environment";
+     return "user";
+   }
+   function getBoxSize() {
+     const minDim = Math.min(window.innerWidth, window.innerHeight - 60); // 扣 header
+     return Math.floor(minDim * 0.9);
+   }
+   function startScanner() {
+     const facingMode = getCameraFacingMode();
+     const qrboxSize = getBoxSize();
+     if (isRunning) {
+       html5QrCode.stop().then(() => {
+         startHtml5QrCode(facingMode, qrboxSize);
+       });
+     } else {
+       startHtml5QrCode(facingMode, qrboxSize);
+     }
+   }
+   function startHtml5QrCode(facingMode, qrboxSize) {
+     html5QrCode = new Html5Qrcode("reader");
+     html5QrCode.start(
+       { facingMode: facingMode },
+       {
+         fps: 10,
+         qrbox: {
+           width: qrboxSize,
+           height: qrboxSize
+         }
+       },
+       onScanSuccess,
+       onScanError
+     ).then(() => {
+       isRunning = true;
+     }).catch(err => console.error("啟動失敗:", err));
+   }
    function onScanSuccess(qrCodeMessage) {
-     console.log("Scanned result:", qrCodeMessage);
-     // 將掃描結果轉成 URL encode 放入變數
      const encodedData = encodeURIComponent(qrCodeMessage.trim());
-     // 跳轉到另一個頁面，並用 ?data=xxx 傳資料
-     window.location.href = `result.html?data=${encodedData}`;
+     html5QrCode.stop().then(() => {
+       window.location.href = `result.html?data=${encodedData}`;
+     });
    }
    function onScanError(errorMessage) {
-     // 可以選擇忽略錯誤或顯示
-     console.warn(errorMessage);
+     // 忽略錯誤
    }
-   const html5QrCode = new Html5Qrcode("reader");
-   const config = {
-     fps: 10,
-     qrbox: {
-       width: 500, // 放大掃描框
-       height: 500
-     },
-     facingMode: "user"
-   };
-   html5QrCode.start(
-     { facingMode: "user" },
-     config,
-     onScanSuccess,
-     onScanError
-   );
+   startScanner();
+   window.addEventListener("resize", () => {
+     clearTimeout(window.resizeTimeout);
+     window.resizeTimeout = setTimeout(() => {
+       startScanner();
+     }, 300);
+   });
 </script>
 </body>
 </html>
