@@ -98,7 +98,7 @@
    function onScanSuccess(qrCodeMessage) {
      const encodedData = encodeURIComponent(qrCodeMessage.trim());
      html5QrCode.stop().then(() => {
-       window.location.href = `result.html?data=${encodedData}`;
+       window.location.href = `done.html?data=${encodedData}`;
      });
    }
    function onScanError(errorMessage) {
