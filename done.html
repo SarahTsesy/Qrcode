@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>獲得星星！</title>
+<style>
+   html, body {
+     margin: 0;
+     padding: 0;
+     background: #fffbe6;
+     font-family: 'Arial', sans-serif;
+     color: #333;
+     display: flex;
+     flex-direction: column;
+     align-items: center;
+     justify-content: center;
+     height: 100vh;
+     overflow: hidden;
+   }
+   img {
+     width: 150px;
+     height: auto;
+     animation: rotate-swing 2s infinite;
+   }
+   @keyframes rotate-swing {
+     0% { transform: rotate(0deg); }
+     25% { transform: rotate(-15deg); }
+     50% { transform: rotate(0deg); }
+     75% { transform: rotate(15deg); }
+     100% { transform: rotate(0deg); }
+   }
+   .message {
+     margin-top: 20px;
+     font-size: 20px;
+     font-weight: bold;
+     text-align: center;
+   }
+</style>
+</head>
+<body>
+<img src="star.png" alt="星星">
+<div class="message">放學打打氣，增值一粒星星</div>
+<script>
+   setTimeout(() => {
+     window.location.href = "index.html";
+   }, 5000);
+</script>
+</body>
+</html>
