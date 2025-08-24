@@ -1,0 +1,114 @@
+<audio src='sound/warning.mp3' autoplay></audio>
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>餘額不足</title>
+<style>
+   :root { --pink: #ffc0cb; }
+   * { box-sizing: border-box; }
+   html, body {
+     height: 100%;
+     margin: 0;
+     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans TC", "PingFang HK", "PingFang TC", "Microsoft JhengHei", Arial, sans-serif;
+     background: var(--pink);
+     color: #222;
+   }
+   .wrap {
+     height: 100%;
+     display: flex;
+     align-items: center;
+     justify-content: center;
+     text-align: center;
+     padding: 24px;
+   }
+   .card {
+     background: rgba(255,255,255,0.72);
+     backdrop-filter: blur(2px);
+     border-radius: 16px;
+     padding: 28px 32px;
+     max-width: 520px;
+     width: 100%;
+     box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+   }
+   .bang {
+     width: 120px; height: 120px;
+     margin: 0 auto 16px;
+     border-radius: 50%;
+     background: #fff;
+     display: flex; align-items: center; justify-content: center;
+     font-weight: 800; font-size: 72px; line-height: 1;
+   }
+   h1 {
+     font-size: 22px;
+     margin: 8px 0 4px;
+   }
+   p {
+     margin: 0;
+     opacity: 0.9;
+     font-size: 15px;
+   }
+   .hint { margin-top: 10px; font-size: 13px; opacity: .7; }
+   .btn {
+     margin-top: 18px;
+     display: inline-block;
+     padding: 10px 16px;
+     border-radius: 10px;
+     background: #fff;
+     border: none;
+     cursor: pointer;
+     font-size: 14px;
+   }
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="card" role="alert" aria-live="polite">
+<div class="bang">!</div>
+<h1>餘額不足，未能完成付款。</h1>
+<p>系統將會自動返回購買頁面。</p>
+<p class="hint"><span id="count">8</span> 秒後跳轉至購物車</p>
+<button class="btn" id="backNow" type="button">立即返回</button>
+</div>
+</div>
+<script>
+   (function () {
+     // 從網址拿 code=?；若沒有，嘗試用 sessionStorage 備援
+     const params = new URLSearchParams(window.location.search);
+     let code = params.get('code') || sessionStorage.getItem('code') || '';
+     // 將 code 暫存（方便之後頁面也可取用）
+     if (code) sessionStorage.setItem('code', code);
+     const target = 'buy.php';
+     const delayMs = 8000;
+     const countEl = document.getElementById('count');
+     // 倒數顯示
+     let remain = Math.ceil(delayMs / 1000);
+     const t = setInterval(() => {
+       remain -= 1;
+       if (remain >= 0) countEl.textContent = remain;
+       if (remain <= 0) clearInterval(t);
+     }, 1000);
+     function postBack() {
+       const form = document.createElement('form');
+       form.method = 'POST';            // 用 POST 帶 code（網址不會顯示）
+       form.action = target;
+       const input = document.createElement('input');
+       input.type = 'hidden';
+       input.name = 'code';
+       input.value = code;              // 若沒取到 code，會以空值提交
+       form.appendChild(input);
+       document.body.appendChild(form);
+       form.submit();
+     }
+     // 8 秒後自動跳轉
+     const to = setTimeout(postBack, delayMs);
+     // 立即返回按鈕
+     document.getElementById('backNow').addEventListener('click', () => {
+       clearTimeout(to);
+       postBack();
+     });
+   })();
+</script>
+</body>
+</html>
